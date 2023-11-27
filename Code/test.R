@@ -1,5 +1,8 @@
 print('hi')
 
+
+read.csv(../)
+
 # ggplot2 패키지를 불러옵니다
 library(ggplot2)
 

@@ -1,16 +1,51 @@
-print('hi')
+complaint <- read.csv("complaints.csv")
+library(dplyr)
+library(textstem)
+library(tm)
+library(stringr)
+View(complaint)
 
 
-read.csv(../)
+# group and paste comments 
 
-# ggplot2 패키지를 불러옵니다
-library(ggplot2)
+Sub.complaint <- complaint %>% filter(Consumer.complaint.narrative != "") %>%
+  group_by(Sub.product) %>%
+  summarise(comments = paste(Consumer.complaint.narrative, collapse = " "))
 
-# mtcars 데이터셋을 이용해 연비(mpg)와 배기량(disp) 간의 관계를 산점도로 그립니다
-ggplot(mtcars, aes(x = disp, y = mpg)) + 
-  geom_point() + 
-  theme_minimal() + 
-  ggtitle("연비와 배기량의 관계") + 
-  xlab("배기량") + 
-  ylab("연비")
+Issue.complaint <- complaint %>% filter(Consumer.complaint.narrative != "") %>%
+  group_by(Issue) %>%
+  summarise(comments = paste(Consumer.complaint.narrative, collapse = " "))
+
+subIs.complaint <- complaint %>% filter(Consumer.complaint.narrative != "") %>%
+  group_by(Sub.issue) %>%
+  summarise(comments = paste(Consumer.complaint.narrative, collapse = " "))
+
+State.complaint <- complaint %>% filter(Consumer.complaint.narrative != "") %>%
+  group_by(State) %>%
+  summarise(comments = paste(Consumer.complaint.narrative, collapse = " ")) 
+
+## pre-processing
+
+process_text <- function(df) {
+  df$comments <- df$comments %>% 
+    str_remove_all("[:punct:]") %>% 
+    str_remove_all("[:digit:]") %>%
+    str_remove_all("\\n|\\$|X{2,}") %>%
+    str_replace_all("[:blank:]{2,}", " ") %>%
+    tolower() %>%
+    lemmatize_words()
+  return(df)
+}
+
+Sub.complaint <- process_text(Sub.complaint)
+Issue.complaint < -process_text(Issue.complaint)
+subIs.complaint <- process_text(subIs.complaint)
+State.complaint <- process_text(State.complaint)
+
+
+
+
+
+
+
 
